@@ -1,0 +1,55 @@
+name: CI
+on:
+  pull_request:
+  push:
+    branches:
+      - main
+jobs:
+  lint:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v7
+      - uses: flox/install-flox-action@v2
+      - uses: ./
+      - run: shellcheck flox-activate-gha.sh
+      - run: shfmt -d flox-activate-gha.sh
+
+  test:
+    strategy:
+      fail-fast: false
+      matrix:
+        runs-on:
+          - ubuntu-latest
+          - macos-latest
+    runs-on: ${{ matrix.runs-on }}
+    steps:
+      - uses: actions/checkout@v7
+      - uses: flox/install-flox-action@v2
+
+      - uses: ./
+        with:
+          dir: test-env
+
+      - name: Packages are on PATH
+        run: hello --version
+      - name: Manifest vars are exported
+        run: test "$ACTION_TEST_VAR" = "from-manifest"
+      - name: Multi-line vars survive
+        run: test "$ACTION_TEST_MULTILINE" = "$(printf 'line one\nline two')"
+      - name: Hook exports are exported
+        run: test "$ACTION_TEST_HOOK_VAR" = "from-hook"
+      - name: Hook stdout is not exported
+        run: test -z "${NOT_A_VAR:-}"
+      - name: FLOX_ENV points at the activated environment
+        run: test -x "$FLOX_ENV/bin/hello"
+
+      - name: Make flox activate fail
+        id: should-fail
+        continue-on-error: true
+        uses: ./
+        with:
+          dir: test-env
+          arguments: --a-bad-flag
+      - name: Fail if the action succeeded when flox activate failed
+        if: steps.should-fail.outcome == 'success'
+        run: exit 1

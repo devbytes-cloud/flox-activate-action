@@ -1,0 +1,19 @@
+schema-version = "1.19.0"
+
+# Fixture environment exercised by .github/workflows/ci.yml.
+[install]
+hello.pkg-path = "hello"
+
+[vars]
+ACTION_TEST_VAR = "from-manifest"
+ACTION_TEST_MULTILINE = """
+line one
+line two"""
+
+[hook]
+on-activate = '''
+  # Output from the hook must not end up in GITHUB_ENV.
+  echo "hook says hi"
+  echo "NOT_A_VAR=should-not-be-exported"
+  export ACTION_TEST_HOOK_VAR="from-hook"
+'''

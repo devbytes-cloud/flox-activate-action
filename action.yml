@@ -1,0 +1,36 @@
+name: Flox Activate Environment
+description: Load a Flox environment into every following step of a GitHub Actions job
+author: DevBytes
+branding:
+  color: blue
+  icon: package
+inputs:
+  environment:
+    description: FloxHub environment to activate (`owner/name`). Defaults to the local environment.
+    required: false
+    default: ""
+  dir:
+    description: Directory containing the `.flox/` directory to activate.
+    required: false
+    default: ""
+  trust:
+    description: Pass `--trust` to `flox activate`, to run the hooks of a FloxHub environment that isn't trusted yet.
+    required: false
+    default: "false"
+  arguments:
+    description: Additional arguments to pass to `flox activate`, split on whitespace.
+    required: false
+    default: ""
+runs:
+  using: composite
+  steps:
+    - name: Activate Flox environment
+      shell: bash
+      env:
+        INPUT_ENVIRONMENT: ${{ inputs.environment }}
+        INPUT_DIR: ${{ inputs.dir }}
+        INPUT_TRUST: ${{ inputs.trust }}
+        INPUT_ARGUMENTS: ${{ inputs.arguments }}
+      run: |
+        read -r -a extra_args <<<"$INPUT_ARGUMENTS"
+        "$GITHUB_ACTION_PATH/flox-activate-gha.sh" ${extra_args[@]+"${extra_args[@]}"}

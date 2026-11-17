@@ -1,0 +1,5 @@
+schema-version = "1.19.0"
+
+[install]
+shellcheck.pkg-path = "shellcheck"
+shfmt.pkg-path = "shfmt"
