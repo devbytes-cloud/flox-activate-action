@@ -9,7 +9,7 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v7
-      - uses: flox/install-flox-action@v2
+      - uses: flox/install-flox-action@5bb9eaaffbeaa699a8251a1ae21ecf4c8e0e37d4 # v2.7.0
       - uses: ./
       - run: shellcheck flox-activate-gha.sh
       - run: shfmt -d flox-activate-gha.sh
@@ -24,7 +24,7 @@ jobs:
     runs-on: ${{ matrix.runs-on }}
     steps:
       - uses: actions/checkout@v7
-      - uses: flox/install-flox-action@v2
+      - uses: flox/install-flox-action@5bb9eaaffbeaa699a8251a1ae21ecf4c8e0e37d4 # v2.7.0
 
       - uses: ./
         with:
